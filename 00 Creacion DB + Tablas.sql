@@ -12,8 +12,12 @@ CREATE TABLE Aldeas(
     IdAldea INT IDENTITY(1,1) NOT NULL,
     Nombre VARCHAR(50) NOT NULL,
     Pais VARCHAR(50) NOT NULL,
+    NombreOficial VARCHAR(100) NULL,
     CONSTRAINT PK_Aldeas PRIMARY KEY (IdAldea),
-    CONSTRAINT UQ_Aldea_Nombre UNIQUE(Nombre) -- No puede haber dos aldeas con el mismo nombre 
+    CONSTRAINT UQ_Aldea_Nombre UNIQUE(Nombre),
+    CONSTRAINT UQ_Aldea_NombreOficial UNIQUE(NombreOficial)
+     -- No puede haber dos aldeas con el mismo nombre 
+
 );
 
 -- https://naruto.fandom.com/es/wiki/Categor%C3%ADa:Rangos_Ninja
