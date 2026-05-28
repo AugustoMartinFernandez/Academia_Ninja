@@ -12,7 +12,7 @@ CREATE TABLE Aldeas(
     IdAldea INT IDENTITY(1,1) NOT NULL,
     Nombre VARCHAR(50) NOT NULL,
     Pais VARCHAR(50) NOT NULL,
-    NombreOficial VARCHAR(100) NULL,
+    NombreOficial VARCHAR(100) NOT NULL,
     CONSTRAINT PK_Aldeas PRIMARY KEY (IdAldea),
     CONSTRAINT UQ_Aldea_Nombre UNIQUE(Nombre),
     CONSTRAINT UQ_Aldea_NombreOficial UNIQUE(NombreOficial)
@@ -46,7 +46,7 @@ CREATE TABLE Dificultades(
 -- 5. Tabla de Elementos (Fuego, Agua, etc.)
 CREATE TABLE Elementos (
     IdElemento INT IDENTITY(1,1) NOT NULL,
-    Nombre VARCHAR(20) NOT NULL,
+    Nombre VARCHAR(50) NOT NULL,
     CONSTRAINT PK_Elementos PRIMARY KEY (IdElemento),
     CONSTRAINT UQ_Elemento_Nombre UNIQUE (Nombre)
 );
