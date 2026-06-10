@@ -1,19 +1,24 @@
 USE AcademiaNinja;
 GO
 
+-- 1. Borramos si existe
+IF OBJECT_ID('TRG_AuditoriaNinjas', 'TR') IS NOT NULL
+    DROP TRIGGER TRG_AuditoriaNinjas;
+GO
+
 CREATE TRIGGER TRG_AuditoriaNinjas
 ON Ninjas
 AFTER INSERT, UPDATE
 AS
 BEGIN
-    -- 1. LÓGICA PARA EL ALTA (INSERT)
+    -- 1. LOGICA PARA EL ALTA (INSERT)
     IF NOT EXISTS (SELECT * FROM deleted)
     BEGIN
         INSERT INTO AuditoriaNinjas (IdNinja, Accion)
         SELECT IdNinja, 'ALTA'
         FROM inserted;
     END
-    -- 2. LÓGICA PARA LA MODIFICACIÓN Y BAJA LÓGICA (UPDATE)
+    -- 2. LOGICA PARA LA MODIFICACIÓN Y BAJA LOGICA (UPDATE)
     IF EXISTS (SELECT * FROM deleted)
     BEGIN 
         -- A. BAJA LOGICA (El estado pasa de 1 a 0)
