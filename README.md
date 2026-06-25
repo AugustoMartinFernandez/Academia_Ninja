@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/T--SQL-Microsoft-6B9BD1?style=for-the-badge&logo=microsoft&logoColor=white" alt="T-SQL">
   <img src="https://img.shields.io/badge/UTN-FRGP-9AA5B1?style=for-the-badge" alt="UTN FRGP">
   <img src="https://img.shields.io/badge/Tem%C3%A1tica-Naruto-E8915B?style=for-the-badge" alt="Temática Naruto">
-  <img src="https://img.shields.io/badge/Estado-Aprobado-8FBF9F?style=for-the-badge" alt="Estado">
+  <img src="https://img.shields.io/badge/Estado-En Curso-8FBF9F?style=for-the-badge" alt="Estado">
 </p>
 
 ---
