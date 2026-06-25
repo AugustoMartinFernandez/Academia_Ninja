@@ -27,3 +27,5 @@ INNER JOIN Aldeas A ON N.IdAldea = A.IdAldea;
 GO
 
 SELECT * FROM vw_DetalleNinjas;
+
+

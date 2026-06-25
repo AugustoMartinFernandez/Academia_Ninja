@@ -3,39 +3,80 @@ GO
 
 INSERT INTO NinjaHabilidades (IdNinja, IdJutsu, NivelMaestria)
 VALUES
--- Naruto (100) Domina Rasenshuriken (2) y Clon de Sombra (6)
-(100, 2, 8),
-(100, 6, 9),
--- Sasuke (101) Domina Gran Bola de Fuego (1) y Chidori (3)
-(101, 1, 8),
-(101, 3, 9),
--- Kakashi (102) Domina Dragón de Agua (5) y Raikiri (7)
-(102, 5, 9),
-(102, 7, 10),
--- Shikamaru (103) Domina Posesión de Sombra (8)
-(103, 8, 9),
--- Gaara (104) Domina Ataúd de Arena (9)
-(104, 9, 10),
--- Sakura (105) Domina Impacto de Flor de Cerezo (10)
-(105, 10, 8),
--- Hinata (106) Domina 64 Palmas (11)
+-- Naruto (100)
+(100, 2, 9), (100, 6, 10), (100, 39, 9), (100, 32, 8), (100, 38, 7),
+-- Sasuke (101)
+(101, 3, 9), (101, 20, 8), (101, 21, 8), (101, 1, 9),
+-- Kakashi (102)
+(102, 7, 10), (102, 3, 9), (102, 24, 8),
+-- Shikamaru (103)
+(103, 8, 8),
+-- Gaara (104)
+(104, 9, 10), (104, 37, 9),
+-- Sakura (105)
+(105, 10, 8), (105, 14, 7),
+-- Hinata (106)
 (106, 11, 7),
--- Rock Lee (107) Domina Loto Primario (12)
-(107, 12, 8),
--- Tsunade (109) Domina Restauración Divina (14)
+-- Rock Lee (107)
+(107, 12, 9),
+-- Might Guy (108)
+(108, 13, 10),
+-- Tsunade (109)
 (109, 14, 10),
--- Temari (110) Domina Guadaña de Viento (15)
-(110, 15, 8),
--- Zabuza (112) Domina Dragón de Agua (5) y Ocultación en Niebla (17)
-(112, 5, 8),
-(112, 17, 9),
--- Mei Terumi (113) Domina Dragón de Agua (5) y Niebla Corrosiva (18)
-(113, 5, 9),
-(113, 18, 10),
--- Darui (114) Domina Pantera Negra (19)
-(114, 19, 9);
+-- Temari (110)
+(110, 15, 9), (110, 41, 8),
+-- Kankuro (111)
+(111, 16, 8),
+-- Zabuza (112)
+(112, 17, 9), (112, 5, 8),
+-- Mei Terumi (113)
+(113, 18, 9),
+-- Darui (114)
+(114, 19, 8),
+-- Neji (115)
+(115, 11, 9),
+-- Haku (117)
+(117, 25, 9), (117, 26, 8),
+-- Kisame (118)
+(118, 33, 9),
+-- Killer Bee (119)
+(119, 36, 9), (119, 32, 8),
+-- Minato (134)
+(134, 31, 10), (134, 6, 9),
+-- Jiraiya (136)
+(136, 38, 9), (136, 39, 8),
+-- Itachi (137)
+(137, 20, 9), (137, 21, 9), (137, 22, 10), (137, 23, 8),
+-- Shisui (138)
+(138, 21, 8),
+-- Obito (139)
+(139, 24, 9),
+-- Madara (140)
+(140, 21, 10), (140, 1, 9),
+-- Hashirama (141)
+(141, 27, 10),
+-- Tobirama (142)
+(142, 28, 9),
+-- Sasori (149)
+(149, 16, 9),
+-- A / Raikage (153)
+(153, 35, 10), (153, 36, 9),
+-- Onoki (156)
+(156, 40, 8),
+-- Deidara (157)
+(157, 34, 9),
+-- Kurotsuchi (158)
+(158, 40, 7),
+-- Nagato (159)
+(159, 29, 10), (159, 30, 9),
+-- Orochimaru (162)
+(162, 28, 10),
+-- Kabuto (163)
+(163, 28, 8), (163, 14, 7),
+-- Konohamaru (127)
+(127, 6, 6);
 GO
 
--- Verificamos 
+-- Verificamos
 SELECT * FROM NinjaHabilidades;
 GO

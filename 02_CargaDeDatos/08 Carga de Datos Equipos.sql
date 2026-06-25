@@ -1,18 +1,20 @@
 USE AcademiaNinja;
 GO
 
-INSERT INTO Equipos (NombreEquipo, IdSensei) 
-VALUES 
-('Equipo 7', 102),                    -- Sensei: Kakashi Hatake
-('Equipo Guy', 108),                  -- Sensei: Might Guy
-('Espadachines de la Niebla', 112),   -- Sensei: Zabuza Momochi
-('Escuadrón Nube', 114),              -- Sensei: Darui
-('Hermanos de la Arena', 104),        -- Lider: Gaara del Desierto
-('Escuadrón de Rescate', 103),        -- Lider: Shikamaru Nara
-('Escuadrón Médico', 109),            -- Sensei: Tsunade Senju
-('Guardia del Mizukage', 113);        -- Sensei: Mei Terumi
+INSERT INTO Equipos (NombreEquipo, IdSensei)
+VALUES
+('Equipo 7', 102),                 
+('Equipo 8', 132),                 
+('Equipo 10', 131),                
+('Equipo Guy', 108),               
+('Equipo de la Arena', 146),       
+('Guardia de la Niebla', 112),     
+('Unidad de la Nube', 119),        
+('Escuadron Anbu Raiz', 145),      
+('Cuerpo Medico de Konoha', 109),  
+('Akatsuki', 159);                 
 GO
 
--- Verificamos 
+-- Verificamos
 SELECT * FROM Equipos;
 GO
