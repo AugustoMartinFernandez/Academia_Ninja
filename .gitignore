@@ -1,1 +1,6 @@
-Mapa Entidad–Relación con enlaces a Fandom.docx
+# Documentos de Word (no van al repo)
+*.docx
+
+# Archivos del sistema
+Thumbs.db
+.DS_Store

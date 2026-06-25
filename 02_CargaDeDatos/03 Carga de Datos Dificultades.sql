@@ -2,13 +2,13 @@ USE AcademiaNinja;
 GO
 
 -- https://naruto.fandom.com/es/wiki/Misiones
-INSERT INTO Dificultades
-VALUES
-('D',5000),
-('C',30000),
-('B',80000),
-('A',150000),
-('S',1000000);
+-- Corregido solo el codigo, sin recompensa
+INSERT INTO Dificultades (Codigo) VALUES
+('D'),
+('C'),
+('B'),
+('A'),
+('S');
 
 -- Verificamos
 SELECT * FROM Dificultades;

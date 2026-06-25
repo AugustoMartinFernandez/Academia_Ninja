@@ -33,7 +33,7 @@ BEGIN
         IF @@TRANCOUNT > 0 
             ROLLBACK TRANSACTION;
             
-        PRINT 'Error al intentar curar al ninja: ' + ERROR_MESSAGE();
+        THROW;
     END CATCH
 END;
 GO
@@ -57,4 +57,4 @@ SELECT Estado FROM Ninjas WHERE IdNinja = 112;
 -- Intentamos curar/ revivir  un ID que no existe 
 EXEC SP_CurarNinja @IdNinja = 99;
 -- Resultado
--- Error al intentar curar al ninja: El Ninja especificado no existe.
+-- Lanza una excepcion real (en rojo): El Ninja especificado no existe.

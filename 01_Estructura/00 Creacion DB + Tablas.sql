@@ -1,49 +1,42 @@
--- 1. Creamos la base de datos
+-- Creamos la base de datos
 CREATE DATABASE AcademiaNinja;
 GO
 
-
+-- Usamos esta base
 USE AcademiaNinja;
 GO
 
--- https://animemanganaruto.fandom.com/es/wiki/Aldea_Oculta
--- 2. Tabla de Aldeas
+-- 1. Aldeas (las aldeas ninja)
 CREATE TABLE Aldeas(
     IdAldea INT IDENTITY(1,1) NOT NULL,
     Nombre VARCHAR(50) NOT NULL,
     Pais VARCHAR(50) NOT NULL,
     NombreOficial VARCHAR(100) NOT NULL,
     CONSTRAINT PK_Aldeas PRIMARY KEY (IdAldea),
-    CONSTRAINT UQ_Aldea_Nombre UNIQUE(Nombre),
+    CONSTRAINT UQ_Aldea_Nombre UNIQUE(Nombre),  -- no puede haber dos aldeas con el mismo nombre
     CONSTRAINT UQ_Aldea_NombreOficial UNIQUE(NombreOficial)
-     -- No puede haber dos aldeas con el mismo nombre 
-
 );
 
--- https://naruto.fandom.com/es/wiki/Categor%C3%ADa:Rangos_Ninja
--- 3. Tabla de Rangos Ninja (Genin, Chunin etc.)
+-- 2. Rangos (Genin, Chunin, Jonin, etc.)
 CREATE TABLE Rangos(
     IdRango INT IDENTITY(1,1) NOT NULL,
     Nombre VARCHAR(20) NOT NULL,
-    NivelPrioridad INT NOT NULL, -- Para lógica de NINJAS Jonin=3, Genin=1
+    NivelPrioridad INT NOT NULL, -- numero para ordenar la jerarquia, mas alto = mas importante
     CONSTRAINT PK_Rangos PRIMARY KEY (IdRango),
     CONSTRAINT UQ_Rango_Nombre UNIQUE (Nombre),
     CONSTRAINT CHK_Prioridad CHECK (NivelPrioridad > 0)
 );
 
--- https://naruto.fandom.com/es/wiki/Misiones <-- Leer 
--- 4. Tabla Dificultades de Mision (D,C,B,A,S)
+-- 3. Dificultades de la mision (D, C, B, A, S)
+-- la recompensa la sacamos de aca, va solo en Misiones (lo que nos corrigio el profe)
 CREATE TABLE Dificultades(
     IdDificultad INT IDENTITY(1,1) NOT NULL,
-    Codigo CHAR(1) NOT NULL, -- D,C, ETC
-    RecompensaBase MONEY NOT NULL,
+    Codigo CHAR(1) NOT NULL,
     CONSTRAINT PK_Dificultades PRIMARY KEY(IdDificultad),
-    CONSTRAINT UQ_Dificultad_Codigo UNIQUE(Codigo),
-    CONSTRAINT CHK_Recompensa CHECK (RecompensaBase >= 0)
+    CONSTRAINT UQ_Dificultad_Codigo UNIQUE(Codigo)
 );
 
--- https://animemanganaruto.fandom.com/es/wiki/Aldea_Oculta 
--- 5. Tabla de Elementos (Fuego, Agua, etc.)
+-- 4. Elementos (Fuego, Agua, Rayo, etc.)
 CREATE TABLE Elementos (
     IdElemento INT IDENTITY(1,1) NOT NULL,
     Nombre VARCHAR(50) NOT NULL,
@@ -51,32 +44,32 @@ CREATE TABLE Elementos (
     CONSTRAINT UQ_Elemento_Nombre UNIQUE (Nombre)
 );
 
--- https://naruto.fandom.com/es/wiki/Sistema_de_Jerarqu%C3%ADa_Shinobi 
--- 6. Tabla de Ninjas
+-- 5. Ninjas (tienen FK a Rangos y a Aldeas)
 CREATE TABLE Ninjas(
-    IdNinja INT IDENTITY(100,1) NOT NULL,
+    IdNinja INT IDENTITY(100,1) NOT NULL,  -- arrancamos en 100 para que los id se vean mas claros
     Nombre VARCHAR(50) NOT NULL,
     Apellido VARCHAR(50) NOT NULL,
-    FechaNacimiento DATe NOT NULL,
+    FechaNacimiento DATE NOT NULL,
     IdRango INT NOT NULL,
     IdAldea INT NOT NULL,
-    Estado BIT NOT NULL DEFAULT 1, -- 1= Activo, 0 = Baja Logica
+    Estado BIT NOT NULL DEFAULT 1, -- 1 = activo, 0 = baja logica
     CONSTRAINT PK_Ninjas PRIMARY KEY(IdNinja),
     CONSTRAINT FK_Ninjas_Rangos FOREIGN KEY(IdRango) REFERENCES Rangos(IdRango),
     CONSTRAINT FK_Ninjas_Aldeas FOREIGN KEY(IdAldea) REFERENCES Aldeas(IdAldea)
 );
 
--- 7. Tabla de Equipos
-CREATE TABLE Equipos(
-    IdEquipo INT IDENTITY(1,1) NOT NULL,
-    NombreEquipo VARCHAR(50) NOT NULL,
-    IdSensei INT NOT NULL, -- El lider del equipo (debe ser rango Jonin, lo validaremos con un Trigger)
-    CONSTRAINT PK_Equipos PRIMARY KEY(IdEquipo),
-    CONSTRAINT UQ_Equipo_Nombre UNIQUE(NombreEquipo),
-    CONSTRAINT FK_EquipoSensei FOREIGN KEY(IdSensei) REFERENCES Ninjas(IdNinja)
+-- 6. Jutsus (tienen FK a Elementos)
+CREATE TABLE Jutsus (
+    IdJutsu INT IDENTITY(1,1) NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
+    IdElemento INT NOT NULL,
+    Descripcion VARCHAR(MAX) NULL,
+    CONSTRAINT PK_Jutsus PRIMARY KEY (IdJutsu),
+    CONSTRAINT UQ_Jutsu_Nombre UNIQUE (Nombre),
+    CONSTRAINT FK_Jutsus_Elementos FOREIGN KEY (IdElemento) REFERENCES Elementos(IdElemento)
 );
 
--- 8. Tabla de Misiones
+-- 7. Misiones (la recompensa vive aca, una sola por mision)
 CREATE TABLE Misiones (
     IdMision INT IDENTITY(1,1) NOT NULL,
     Descripcion VARCHAR(255) NOT NULL,
@@ -86,57 +79,55 @@ CREATE TABLE Misiones (
     CONSTRAINT FK_Misiones_Dificultades FOREIGN KEY (IdDificultad) REFERENCES Dificultades(IdDificultad)
 );
 
--- 9. Tabla de Asignaciones (Donde se une Equipo con Mision)
+-- 8. Equipos (el sensei es un ninja, por eso la FK va a Ninjas)
+CREATE TABLE Equipos(
+    IdEquipo INT IDENTITY(1,1) NOT NULL,
+    NombreEquipo VARCHAR(50) NOT NULL,
+    IdSensei INT NOT NULL, -- el lider del equipo, tiene que ser un ninja de rango Jonin
+    CONSTRAINT PK_Equipos PRIMARY KEY(IdEquipo),
+    CONSTRAINT UQ_Equipo_Nombre UNIQUE(NombreEquipo),
+    CONSTRAINT FK_EquipoSensei FOREIGN KEY(IdSensei) REFERENCES Ninjas(IdNinja)
+);
+
+-- 9. NinjaHabilidades (relacion muchos a muchos entre Ninjas y Jutsus)
+CREATE TABLE NinjaHabilidades (
+    IdNinja INT NOT NULL,
+    IdJutsu INT NOT NULL,
+    NivelMaestria INT DEFAULT 1,  -- del 1 al 10
+    CONSTRAINT PK_NinjaHabilidades PRIMARY KEY (IdNinja, IdJutsu),  -- clave compuesta
+    CONSTRAINT FK_Habilidades_Ninja FOREIGN KEY (IdNinja) REFERENCES Ninjas(IdNinja),
+    CONSTRAINT FK_Habilidades_Jutsu FOREIGN KEY (IdJutsu) REFERENCES Jutsus(IdJutsu),
+    CONSTRAINT CHK_Maestria CHECK (NivelMaestria BETWEEN 1 AND 10)
+);
+
+-- 10. EquipoDetalle (los alumnos de cada equipo)
+CREATE TABLE EquipoDetalle (
+    IdEquipo INT NOT NULL,
+    IdNinja INT NOT NULL,
+    CONSTRAINT PK_EquipoDetalle PRIMARY KEY (IdEquipo, IdNinja),  -- clave compuesta equipo + ninja
+    CONSTRAINT FK_Detalle_Equipo FOREIGN KEY (IdEquipo) REFERENCES Equipos(IdEquipo),
+    CONSTRAINT FK_Detalle_Ninja FOREIGN KEY (IdNinja) REFERENCES Ninjas(IdNinja)
+);
+
+-- 11. Asignaciones (une un equipo con una mision, la asignacion es al equipo)
 CREATE TABLE Asignaciones (
     IdAsignacion INT IDENTITY(1,1) NOT NULL,
     IdMision INT NOT NULL,
     IdEquipo INT NOT NULL,
     FechaInicio DATETIME NOT NULL DEFAULT GETDATE(),
-    FechaFin DATETIME NULL,
-    Estado VARCHAR(20) NOT NULL DEFAULT 'En Curso', --  En curso, Completada, Fallida.
+    FechaFin DATETIME NULL,  -- queda en null mientras la mision esta en curso
+    Estado VARCHAR(20) NOT NULL DEFAULT 'En Curso',
     CONSTRAINT PK_Asignaciones PRIMARY KEY (IdAsignacion),
     CONSTRAINT FK_Asignaciones_Misiones FOREIGN KEY (IdMision) REFERENCES Misiones(IdMision),
     CONSTRAINT FK_Asignaciones_Equipos FOREIGN KEY (IdEquipo) REFERENCES Equipos(IdEquipo),
     CONSTRAINT CHK_EstadoMision CHECK (Estado IN ('En Curso', 'Completada', 'Fallida'))
 );
 
--- 10. Tabla Detalle de Equipo (Asociamos los ninjas alumnos al equipo)
-CREATE TABLE EquipoDetalle (
-    IdEquipo INT NOT NULL,
-    IdNinja INT NOT NULL,
-    CONSTRAINT PK_EquipoDetalle PRIMARY KEY (IdEquipo, IdNinja), -- Clave compuesta
-    CONSTRAINT FK_Detalle_Equipo FOREIGN KEY (IdEquipo) REFERENCES Equipos(IdEquipo),
-    CONSTRAINT FK_Detalle_Ninja FOREIGN KEY (IdNinja) REFERENCES Ninjas(IdNinja)
-);
-
--- https://naruto.fandom.com/es/wiki/Jutsu
--- 11. Tabla de Jutsus
-CREATE TABLE Jutsus (
-    IdJutsu INT IDENTITY(1,1) NOT NULL,
-    Nombre VARCHAR(100) NOT NULL,
-    IdElemento INT NOT NULL, -- FK a la tabla de Elementos
-    Descripcion VARCHAR(MAX) NULL,
-    CONSTRAINT PK_Jutsus PRIMARY KEY (IdJutsu),
-    CONSTRAINT UQ_Jutsu_Nombre UNIQUE (Nombre),
-    CONSTRAINT FK_Jutsus_Elementos FOREIGN KEY (IdElemento) REFERENCES Elementos(IdElemento)
-);
-
--- 12. Tabla NinjaHabilidades (Relacion muchos a muchos entre Ninjas y Jutsus)
-CREATE TABLE NinjaHabilidades (
-    IdNinja INT NOT NULL,
-    IdJutsu INT NOT NULL,
-    NivelMaestria INT DEFAULT 1, -- Ejemplo: 1 al 10
-    CONSTRAINT PK_NinjaHabilidades PRIMARY KEY (IdNinja, IdJutsu),
-    CONSTRAINT FK_Habilidades_Ninja FOREIGN KEY (IdNinja) REFERENCES Ninjas(IdNinja),
-    CONSTRAINT FK_Habilidades_Jutsu FOREIGN KEY (IdJutsu) REFERENCES Jutsus(IdJutsu),
-    CONSTRAINT CHK_Maestria CHECK (NivelMaestria BETWEEN 1 AND 10)
-);
-
--- 13. Tabla AuditoriaNinjas 
+-- 12. AuditoriaNinjas (guardamos los cambios que se hacen sobre los ninjas)
 CREATE TABLE AuditoriaNinjas (
     IdLog INT IDENTITY(1,1) NOT NULL,
     IdNinja INT NOT NULL,
-    Accion VARCHAR(50), -- Aqui guardaremos 'ALTA', 'MODIFICACION' o 'BAJA LOGICA'
+    Accion VARCHAR(50),  -- 'ALTA', 'MODIFICACION' o 'BAJA LOGICA'
     Fecha DATETIME DEFAULT GETDATE(),
     CONSTRAINT PK_AuditoriaNinjas PRIMARY KEY (IdLog)
 );

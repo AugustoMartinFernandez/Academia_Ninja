@@ -6,14 +6,13 @@ IF OBJECT_ID('SP_AsignarMision', 'P') IS NOT NULL
     DROP PROCEDURE SP_AsignarMision;
 GO
 
--- 2. Creamos el procedimiento 
+-- 2. Creamos el procedimiento
 CREATE PROCEDURE SP_AsignarMision
     @IdMision INT,
     @IdEquipo INT
 AS
 BEGIN
     BEGIN TRY
-        -- A. Validaciones previas 
         -- 1. Validar que la mision exista
         IF NOT EXISTS (SELECT 1 FROM Misiones WHERE IdMision = @IdMision)
         BEGIN
@@ -26,48 +25,51 @@ BEGIN
             RAISERROR('Error: El equipo especificado no existe.', 16, 1);
             RETURN;
         END
-        -- 3. Validar que el equipo no tenga ya esta misma mision asignada y pendiente
-        IF EXISTS (SELECT 1 FROM Asignaciones WHERE IdMision = @IdMision AND IdEquipo = @IdEquipo AND Estado = 'En Curso')
+        -- 3. Regla de negocio: un equipo no puede tomar una mision nueva
+        --    si todavia tiene CUALQUIER mision en curso. Debe terminar la actual primero.
+        IF EXISTS (SELECT 1 FROM Asignaciones WHERE IdEquipo = @IdEquipo AND Estado = 'En Curso')
         BEGIN
-            RAISERROR('Error: El equipo ya tiene esta mision en curso.', 16, 1);
+            RAISERROR('Error: El equipo ya tiene una mision en curso. Debe finalizarla antes de tomar otra.', 16, 1);
             RETURN;
         END
-        -- B. Inicio de la Transaccion segura
+        -- Inicio de la Transaccion segura
         BEGIN TRANSACTION;
             -- Insertamos la asignacion en la tabla
             INSERT INTO Asignaciones (IdMision, IdEquipo, FechaInicio, Estado)
             VALUES (@IdMision, @IdEquipo, GETDATE(), 'En Curso');
-        -- C. Confirmamos la transaccion si todo salio perfecto
+        -- Confirmamos la transaccion si todo salio perfecto
         COMMIT TRANSACTION;
         PRINT 'Exito: Mision asignada al equipo correctamente.';
     END TRY
     BEGIN CATCH
-        -- D. Manejo de Errores
+        -- Manejo de Errores
         -- Si hay una transaccion abierta a la mitad, deshacemos todos los cambios
-        IF @@TRANCOUNT > 0 
+        IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
-            
-        PRINT 'Error en el sistema: ' + ERROR_MESSAGE();
+
+        THROW;
     END CATCH
 END;
 GO
 
 -- PRUEBAS DE FUNCIONAMIENTO Y VALIDACION
 
--- Prueba 1: Asignacion exitosa
--- Asignamos la mision 1 (Encontrar al gato Tora) al Equipo 1 (Equipo 7)
-EXEC SP_AsignarMision @IdMision = 1, @IdEquipo = 1;
+-- (EXITO) el Equipo 8 (IdEquipo 2) no tiene ninguna mision en curso en la carga.
+EXEC SP_AsignarMision @IdMision = 2, @IdEquipo = 2;
 -- Resultado: Exito: Mision asignada al equipo correctamente.
 
--- Prueba 2: Regla(Evitar duplicados pendientes)
--- Intentamos asignar exactamente la misma mision al mismo equipo inmediatamente despues
-EXEC SP_AsignarMision @IdMision = 1, @IdEquipo = 1;
--- Resultado: Error en el sistema: Error: El equipo ya tiene esta mision en curso.
+--(BLOQUEO por equipo ocupado) el Equipo 7 (IdEquipo 1) ya tiene la mision de Pain en curso.
+-- Le mandamos una mision DISTINTA para demostrar que bloquea cualquier mision nueva, no solo la repetida.
+EXEC SP_AsignarMision @IdMision = 5, @IdEquipo = 1;
+-- Resultado: Lanza excepcion: Error: El equipo ya tiene una mision en curso...
 
--- Prueba 3: Error de integridad (Equipo inexistente)
--- Intentamos asignar una mision a un equipo ID 999 que no existe
+--(Equipo inexistente)
 EXEC SP_AsignarMision @IdMision = 1, @IdEquipo = 999;
--- Resultado: Error en el sistema: Error: El equipo especificado no existe.
+-- Resultado: Lanza excepcion: Error: El equipo especificado no existe.
+
+--(Mision inexistente)
+EXEC SP_AsignarMision @IdMision = 999, @IdEquipo = 4;
+-- Resultado: Lanza excepcion: Error: La mision especificada no existe.
 
 -- Comprobacion final en la tabla
 SELECT * FROM Asignaciones ORDER BY IdAsignacion DESC;

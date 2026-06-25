@@ -2,272 +2,176 @@
   <img src="./banner-academia-ninja.png" alt="Academia Ninja" width="100%">
 </p>
 
-# 🥷 Academia Ninja - Proyecto Integrador de Base de Datos II
+# 🥷 Academia Ninja — Proyecto Integrador de Base de Datos II
 
 <p align="center">
-  <img src="https://img.shields.io/badge/SQL%20Server-2022-red?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server">
-  <img src="https://img.shields.io/badge/T--SQL-Microsoft-blue?style=for-the-badge" alt="T-SQL">
-  <img src="https://img.shields.io/badge/UTN-FRGP-lightgrey?style=for-the-badge" alt="UTN FRGP">
-  <img src="https://img.shields.io/badge/Rama-tincho-orange?style=for-the-badge&logo=git&logoColor=white" alt="Branch">
+  <img src="https://img.shields.io/badge/SQL%20Server-2022-D96459?style=for-the-badge&logo=microsoftsqlserver&logoColor=white" alt="SQL Server">
+  <img src="https://img.shields.io/badge/T--SQL-Microsoft-6B9BD1?style=for-the-badge&logo=microsoft&logoColor=white" alt="T-SQL">
+  <img src="https://img.shields.io/badge/UTN-FRGP-9AA5B1?style=for-the-badge" alt="UTN FRGP">
+  <img src="https://img.shields.io/badge/Tem%C3%A1tica-Naruto-E8915B?style=for-the-badge" alt="Temática Naruto">
+  <img src="https://img.shields.io/badge/Estado-Aprobado-8FBF9F?style=for-the-badge" alt="Estado">
 </p>
 
 ---
 
-¡Buenas!
+## 🍥 De qué se trata esto
 
-Bienvenidos al repositorio de nuestro Trabajo Práctico Integrador para la materia **Base de Datos II** de la **Tecnicatura Universitaria en Programación (UTN FRGP)**.
+Este es el Trabajo Práctico Integrador de la materia **Base de Datos II** de la Tecnicatura Universitaria en Programación (UTN FRGP). La idea era armar una base de datos completa de punta a punta, y para que no fuera el típico ejemplo aburrido de clientes y facturas, la temática la sacamos del universo de **Naruto**.
 
-Armamos este sistema desde cero para gestionar de punta a punta todo el funcionamiento de una **Academia Ninja** inspirada en el universo de Naruto.
+Academia Ninja es un sistema para gestionar una academia de ninjas: registra a los personajes, los agrupa en aldeas y rangos, los arma en equipos con un sensei a cargo, les asigna misiones según la dificultad y lleva el control de qué técnicas (jutsus) sabe cada uno. Todo eso con la lógica importante metida adentro del motor (vistas, procedimientos y triggers), no afuera.
 
-La idea principal de este proyecto es centralizar y blindar toda la lógica pesada del negocio (como las auditorías de los personajes, el control de las escuadras y el estado financiero de las misiones peligrosas) directamente adentro del servidor usando **SQL Server**.
-
-Con esto logramos que los datos sean consistentes, que las consultas vuelen y que el sistema sea inmune a fallos de sincronización.
+Lo dejamos público con dos intenciones: que cualquier alumno que esté arrancando con bases de datos pueda mirar cómo está armado y guiarse, y de paso dejar registro de lo que fuimos aprendiendo en la cursada.
 
 ---
 
-# 📂 Organización del Proyecto (Arquitectura)
+## 📜 Qué conceptos de la materia se ven acá
 
-Para que el repositorio sea legible, fácil de mantener y no tenga un millón de scripts sueltos en la raíz, ordenamos todo de forma cronológica según su ejecución en las siguientes carpetas:
+Si estás cursando algo parecido, en este repo vas a encontrar ejemplos concretos y funcionando de:
 
-```text
-Academia_Ninja/
-│
-├── 01_Estructura/
-│   └── 00 Creacion DB + Tablas.sql
-├── 02_CargaDeDatos/
-│   ├── 01 Carga de Datos Aldeas.sql
-│   ├── 02 Carga de Datos Rangos.sql
-│   ├── 03 Carga de Datos Dificultades.sql
-│   ├── 04 Carga de Datos Elementos.sql
-│   ├── 05 Carga de Datos Ninjas.sql
-│   ├── 06 Carga de Datos Jutsus.sql
-│   ├── 07 Carga de Datos Misiones.sql
-│   ├── 08 Carga de Datos Equipos.sql
-│   ├── 09 Carga de Datos EquiposDetalle.sql
-│   ├── 10 Carga de Datos NinjaHabilidades.sql
-│   └── 11 Carga de Datos Asignaciones .sql
-├── 03_Vistas/
-│   ├── 12 Vista Detalle Ninja.sql
-│   ├── 13 Vista Libro Bingo.sql
-│   ├── 14 Vista Historial y Estado Financiero de Misiones por Equipo.sql
-│   ├── 16 Vista_ComposicionEquipos.sql
-│   └── 19 Vistas_Filtros_y_Resumenes.sql
-├── 04_Triggers/
-│   ├── 15 Trigger Auditoría de la tabla Ninjas.sql
-│   └── 18 Trigger Validacion Ingreso Equipo.sql
-├── 05_Procedimientos/
-│   ├── 17 _SP_CurarNinja.sql
-│   └── 20 SP Asignar Mision.sql
-│
+- **Modelo relacional y normalización** hasta tercera forma normal (3FN).
+- **Integridad referencial** con claves foráneas, y **claves primarias compuestas** en las tablas intermedias.
+- **Relaciones muchos a muchos** resueltas con tablas intermedias.
+- **Restricciones** del lado del motor: `PRIMARY KEY`, `UNIQUE`, `CHECK`, `DEFAULT` e `IDENTITY`.
+- **Baja lógica** en lugar de borrado físico.
+- **Vistas** con distintos tipos de JOIN, `LEFT JOIN` para detectar faltantes y funciones de agregación con `GROUP BY`.
+- **Procedimientos almacenados** con transacciones y manejo de errores (`BEGIN TRAN`, `TRY/CATCH`, `THROW`).
+- **Triggers** de auditoría y de validación de reglas de negocio, usando las tablas `inserted` y `deleted` y `ROLLBACK`.
+
+---
+
+## 🗺️ El modelo de datos
+
+La base tiene 12 tablas. Las separamos en tres grupos según para qué sirven.
+
+**Tablas de catálogo** (datos fijos de referencia):
+
+| Tabla | Para qué |
+|---|---|
+| `Aldeas` | Las villas ninja (Konoha, Suna, etc.) con su país. |
+| `Rangos` | La jerarquía, de Estudiante hasta Kage, con un nivel de prioridad. |
+| `Dificultades` | La clasificación de las misiones por código (D, C, B, A, S). |
+| `Elementos` | Las naturalezas de chakra (Fuego, Agua, Rayo, etc.). |
+
+**Tablas principales** (las entidades del negocio):
+
+| Tabla | Para qué |
+|---|---|
+| `Ninjas` | Los personajes. Cada uno pertenece a una aldea y a un rango. Usa baja lógica con el campo `Estado`. |
+| `Jutsus` | Las técnicas. Cada jutsu pertenece a un elemento. |
+| `Misiones` | Las misiones, cada una con su dificultad y su recompensa propia. |
+| `Equipos` | Las escuadras. Cada equipo tiene un sensei, que a su vez es un ninja. |
+
+**Tablas intermedias y de auditoría:**
+
+| Tabla | Para qué |
+|---|---|
+| `EquipoDetalle` | Resuelve el N a N entre Equipos y Ninjas (los alumnos de cada equipo). |
+| `NinjaHabilidades` | Resuelve el N a N entre Ninjas y Jutsus, guardando el nivel de maestría. |
+| `Asignaciones` | Vincula un Equipo con una Misión, con fecha de inicio, fin y estado. |
+| `AuditoriaNinjas` | Registra automáticamente las altas, bajas y modificaciones de ninjas. |
+
+### 🌀 El núcleo del sistema
+
+La parte más importante del modelo es cómo se conectan los equipos con las misiones. Un equipo no se relaciona directo con una misión: la relación pasa siempre por una **asignación**. Así, la tabla `Asignaciones` es la que sabe qué equipo está haciendo qué misión, desde cuándo y en qué estado (En Curso, Completada o Fallida). Un ninja, además, puede estar en más de un equipo, y por eso entre `Ninjas` y `Equipos` hay una tabla intermedia (`EquipoDetalle`) en lugar de una FK directa.
+
+El diagrama entidad-relación completo está en el archivo `Mapa Entidad–Relación con enlaces a Fandom.docx`.
+
+---
+
+## 🔥 La historia detrás (y lo que aprendimos)
+
+Vale la pena contar esto porque fue la parte donde más aprendimos.
+
+La primera entrega del diagrama nos la rechazaron. El profe nos marcó cardinalidades dadas vuelta, líneas de relación que no correspondían y un posible problema de normalización con la recompensa. La primera reacción fue pensar que teníamos que rehacer media base.
+
+Cuando nos pusimos a revisar en serio, nos dimos cuenta de algo importante: **casi todos los errores eran del dibujo, no de la base.** El diagrama lo habíamos hecho en una app de diagramas y se había subido sin que el grupo lo cruzara contra el script real, así que tenía cardinalidades mal puestas y relaciones de más que en la base de datos en realidad no existían. La arquitectura de las tablas estaba bien; lo que estaba mal era cómo la habíamos representado. Rehacer el DER y revisarlo entre todos resolvió la mayoría de las observaciones.
+
+La excepción, el único error que sí era de diseño, fue el de la recompensa. La teníamos en dos lugares al mismo tiempo: en `Dificultades` y en `Misiones`. Eso generaba la duda de cuál era la recompensa real que cobraba un equipo al terminar una misión, y rompía la 3FN porque la misma información vivía en dos tablas. **La solución fue dejar la recompensa solamente en `Misiones`**, que es donde corresponde, porque cada misión tiene su propio pago. `Dificultades` quedó únicamente con el código (D, C, B, A, S), que es su verdadera función: clasificar.
+
+La moraleja que nos llevamos: un diagrama mal dibujado no significa que la base esté mal, pero hay que validarlo siempre contra el script antes de entregar. Y que la normalización no es un capricho teórico, sirve justamente para que no pase lo de la recompensa duplicada.
+
+---
+
+## ⚙️ Objetos de la base
+
+### 👁️ Vistas
+
+| Vista | Qué muestra |
+|---|---|
+| `vw_DetalleNinjas` | Cada ninja con su rango y su aldea ya resueltos en texto (sin tener que hacer los JOINs a mano). |
+| `vw_LibroBingoHabilidades` | Qué jutsus sabe cada ninja, de qué elemento son y con qué nivel de maestría. |
+| `vw_HistorialMisionesEquipos` | El historial de misiones por equipo, con su sensei, la dificultad, la recompensa y el estado. |
+| `vw_ComposicionEquipos` | El sensei y los alumnos de cada escuadra. |
+| `vw_NinjasSinEquipo` | Los ninjas que todavía no están en ningún equipo (usa `LEFT JOIN` con `IS NULL`). |
+| `vw_ResumenAldeas` | Cuántos ninjas tiene cada aldea (usa `GROUP BY` y `COUNT`). |
+
+### ⚡ Procedimientos almacenados
+
+- **`SP_CurarNinja`**: reactiva a un ninja que estaba dado de baja (vuelve su estado a 1). Valida que el ninja exista y trabaja dentro de una transacción.
+- **`SP_AsignarMision`**: asigna una misión a un equipo. Antes de insertar valida que la misión y el equipo existan, y aplica la regla de negocio de que un equipo no puede tomar una misión nueva si ya tiene otra en curso. Todo dentro de una transacción con manejo de errores.
+
+### 🔔 Triggers
+
+- **`TRG_AuditoriaNinjas`**: cada vez que se da de alta, se modifica o se da de baja a un ninja, deja el registro automático en `AuditoriaNinjas`.
+- **`TRG_ValidarIngresoEquipo`**: no permite sumar a un equipo a un ninja que esté dado de baja.
+- **`TRG_ValidarSensei`**: no permite que el sensei de un equipo sea de un rango menor a Jonin.
+
+---
+
+## 🎴 Reglas de negocio que hace cumplir la base
+
+- Un ninja pertenece a una sola aldea y a un solo rango.
+- El sensei de un equipo tiene que ser un ninja de rango Jonin o superior.
+- Una misión tiene una sola dificultad y una sola recompensa.
+- Un equipo no puede tener dos misiones en curso al mismo tiempo.
+- No se puede sumar a un equipo a un ninja dado de baja.
+- Los ninjas no se borran, se dan de baja lógicamente, y todo cambio queda auditado.
+
+---
+
+## ▶️ Cómo levantar la base
+
+Necesitás SQL Server y un cliente como SSMS o Azure Data Studio. Los scripts están numerados y hay que correrlos **en orden**, porque cada uno depende de que el anterior ya haya creado o cargado lo suyo.
+
+1. **`01_Estructura`** — crea la base y las 12 tablas.
+2. **`02_CargaDeDatos`** — cargá los archivos del 01 al 11 en orden. El orden importa por las claves foráneas (primero los catálogos, después ninjas y jutsus, y al final las tablas que cruzan datos como equipos, habilidades y asignaciones).
+3. **`03_Vistas`** — crea las 6 vistas.
+4. **`04_Procedimientos`** — crea `SP_CurarNinja` y `SP_AsignarMision`.
+5. **`05_Triggers`** — crea los 3 triggers.
+
+> **Importante:** los procedimientos van **antes** que los triggers. Esto es así porque la prueba del trigger de ingreso al equipo usa el `SP_CurarNinja`, así que el procedimiento tiene que existir primero. Si los corrés al revés, el script del trigger te va a fallar.
+
+Cada script trae al final sus propias pruebas (los `SELECT` de verificación y algunos `EXEC` que lanzan errores a propósito). Esos errores controlados, con su mensaje en rojo, no son una falla: son la demostración de que las validaciones funcionan.
+
+---
+
+## 📂 Estructura del repo
+
+```
+AcademiaNinja/
+├── 01_Estructura/        Creación de la base y las tablas
+├── 02_CargaDeDatos/      Inserts de todas las tablas, en orden de dependencias
+├── 03_Vistas/            Las 6 vistas
+├── 04_Procedimientos/    SP_CurarNinja y SP_AsignarMision
+├── 05_Triggers/          Los 3 triggers
+├── Mapa Entidad–Relación con enlaces a Fandom.docx
 └── README.md
 ```
 
 ---
 
-# 🛠️ Cómo Instalar y Levantar la Base de Datos
+## Tecnologías
 
-## 1️⃣ Clonar el repositorio
-
-Abrís una terminal de Git Bash, CMD o la consola que uses en la carpeta donde quieras guardar el código y ejecutás:
-
-```bash
-git clone [https://github.com/AugustoMartinFernandez/Academia_Ninja.git](https://github.com/AugustoMartinFernandez/Academia_Ninja.git)
-cd Academia_Ninja
-```
+- **SQL Server 2022** como motor de base de datos.
+- **T-SQL** para toda la lógica (tablas, vistas, procedimientos y triggers).
+- **SSMS** para el desarrollo y el diagrama entidad-relación.
 
 ---
 
-## 2️⃣ Ejecutar los Scripts en Microsoft SQL Server
+## Autores
 
-Abrís tu SQL Server Management Studio (SSMS) o Visual Studio Code (asegurate de tener la extensión MSSQL conectada a tu instancia local) y ejecutás los archivos respetando estrictamente el orden de las carpetas.
-
-### Paso 1
-
-Entrás a la carpeta `01_Estructura` y corrés el archivo `00 Creacion DB + Tablas.sql` para levantar la base de datos **AcademiaNinja** y su esqueleto relacional.
+Proyecto realizado por **Augusto Martín Fernández**, **José Esteban Contreras** y **Ramiro Alomo** para la materia Base de Datos II — UTN FRGP.
 
 ---
 
-### Paso 2
-
-Vas a la carpeta `02_CargaDeDatos` y ejecutás los archivos del **01 al 11** uno atrás del otro.
-
-Esto va a poblar las tablas con los personajes más conocidos (Naruto, Sasuke, Kakashi, etc.), sus jutsus, las aldeas ocultas y sus escuadras oficiales.
-
----
-
-### Paso 3
-
-Corrés todos los scripts de las carpetas `03_Vistas`, `04_Triggers` y `05_Procedimientos` para cargar toda la inteligencia y las restricciones automáticas al motor de consultas.
-
----
-
-# 🚀 Guía de Pruebas: ¿Cómo ver la magia en acción?
-
-Para comprobar que las reglas de negocio funcionan correctamente y que la base de datos es robusta, armamos este mapa de pruebas rápido.
-
-Podés copiar y pegar cada bloque directamente en tu consola SQL.
-
----
-
-## 🚫 Prueba 1: Trigger de Validación (Integridad del Negocio)
-
-El trigger **TRG_ValidarIngresoEquipo** controla que nadie pueda mandar a pelear a un ninja que fue dado de baja.
-
-```sql
--- Pasamos a Zabuza Momochi (ID 112) a estado inactivo (baja logica)
-UPDATE Ninjas
-SET Estado = 0
-WHERE IdNinja = 112;
-
--- Intentamos meterlo a la fuerza en el Equipo 7 (Tabla EquipoDetalle)
-INSERT INTO EquipoDetalle (IdEquipo, IdNinja)
-VALUES (1, 112);
-```
-
-**Resultado esperado:**
-```text
-SQL frena la operacion al toque con un error rojo:
-"Regla de Negocio: No se puede asignar a un equipo un ninja que este dado de baja (inactivo)."
-```
-
----
-
-## 🩺 Prueba 2: Procedimiento Almacenado Transaccional (Manejo de Errores)
-
-Si queremos reactivar a Zabuza para que pueda volver a unirse a una escuadra, tenemos que usar el procedimiento médico controlado **SP_CurarNinja**.
-
-```sql
--- Ejecutamos la curacion medica de Zabuza
-EXEC SP_CurarNinja @IdNinja = 112;
-```
-
-**Resultado esperado:**
-```text
-"Ninja curado y reactivado exitosamente."
-```
-
----
-
-```sql
--- Si tiramos un ID que no existe para probar el control de errores:
-EXEC SP_CurarNinja @IdNinja = 999;
-```
-
-**Resultado esperado:**
-```text
-"El Ninja especificado no existe."
-```
-
----
-
-## 💵 Prueba 3: SP de Asignación de Misiones con Transacciones
-
-El procedimiento **SP_AsignarMision** mete la inserción adentro de un BEGIN TRANSACTION para asegurar que el equipo no duplique trabajos en curso.
-
-```sql
--- Le asignamos la Mision 1 (Encontrar al gato Tora) al Equipo 1
-EXEC SP_AsignarMision
-    @IdMision = 1,
-    @IdEquipo = 1;
-```
-
-**Resultado esperado:**
-```text
-"Exito: Mision asignada al equipo correctamente."
-```
-
----
-
-```sql
--- Intentamos asignar nuevamente la misma misión
-EXEC SP_AsignarMision
-    @IdMision = 1,
-    @IdEquipo = 1;
-```
-
-**Resultado esperado:**
-```text
-"Error: El equipo ya tiene esta misión en curso."
-```
-
----
-
-## 📊 Prueba 4: Vistas de Resumen y Uso de LEFT JOIN
-
-```sql
--- Consultamos la estadistica de ninjas por aldea
-SELECT *
-FROM vw_ResumenAldeas
-ORDER BY CantidadNinjas DESC;
-```
-
-**Resultado esperado:**
-```text
-Muestra todas las aldeas y acopla un COUNT agrupado con GROUP BY.
-Aldeas como "Iwa" salen con 0 en vez de desaparecer gracias al LEFT JOIN.
-```
-
----
-
-```sql
--- Consultamos que personajes estan sin escuadra asignada actualmente
-SELECT *
-FROM vw_NinjasSinEquipo;
-```
-
-**Resultado esperado:**
-```text
-Lista todos los shinobis disponibles y lideres libres que no figuran en EquipoDetalle.
-```
-
----
-
-## 📝 Prueba 5: Trigger de Auditoría (Trazabilidad)
-
-Cualquier movimiento que ocurra sobre el personal es trackeado automáticamente por el trigger **TRG_AuditoriaNinjas**.
-
-```sql
--- Revisamos la tabla de auditoría
-SELECT *
-FROM AuditoriaNinjas;
-```
-
-**Resultado esperado:**
-```text
-Vas a ver los logs con etiquetas claras de:
-- ALTA
-- MODIFICACION
-- BAJA LOGICA
-```
-
----
-
-# 👥 Integrantes - Grupo #09
-
-- Fernandez, Augusto Martin
-- Alomo, Ramiro Santino
-- Contreras, Esteban
-
----
-
-## 🎓 Institución
-
-Este proyecto fue desarrollado bajo los lineamientos académicos exigidos por la cátedra de **Base de Datos II** de la **UTN FRGP - Cursada 2026**.
-
----
-
-## 🌐 Conectá Conmigo
-
-Si te gustó cómo quedó estructurada esta base de datos o querés ver más proyectos y contenido sobre desarrollo web y programación, ¡te invito a seguirme en mis redes!
-
-<p align="center">
-  <a href="https://www.linkedin.com/in/tinchodev" target="_blank">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn TinchoDev">
-  </a>
-  <a href="https://www.instagram.com/tinchoo_dev?igsh=ZXV4eGl3amgyYWE0&utm_source=qr" target="_blank">
-    <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram TinchoDev">
-  </a>
-  <a href="https://www.facebook.com/share/18JpcvWkNq/?mibextid=wwXIfr" target="_blank">
-    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" alt="Facebook TinchoDev">
-  </a>
-</p>
+> Si estás aprendiendo bases de datos y algo de esto te sirve, usalo tranquilo. Y si encontrás algo que se pueda mejorar, mejor todavía.
