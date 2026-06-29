@@ -29,11 +29,12 @@ GO
 CREATE VIEW vw_ResumenAldeas AS
 SELECT 
     a.Nombre AS NombreAldea,
-    a.Pais AS PaisAldea,
+    P.Nombre AS PaisAldea,
     COUNT(n.IdNinja) AS CantidadNinjas
 FROM Aldeas a
+Inner Join Paises p On a.IdPais = p.IdPais
 LEFT JOIN Ninjas n ON a.IdAldea = n.IdAldea
-GROUP BY a.Nombre, a.Pais;
+GROUP BY a.Nombre, p.Nombre;
 GO
 
 -- PRUEBAS DE FUNCIONAMIENTO Y VALIDACION

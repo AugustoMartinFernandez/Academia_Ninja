@@ -41,13 +41,14 @@ Si estás cursando algo parecido, en este repo vas a encontrar ejemplos concreto
 
 ## 🗺️ El modelo de datos
 
-La base tiene 12 tablas. Las separamos en tres grupos según para qué sirven.
+La base tiene 13 tablas. Las separamos en tres grupos según para qué sirven.
 
 **Tablas de catálogo** (datos fijos de referencia):
 
 | Tabla | Para qué |
 |---|---|
-| `Aldeas` | Las villas ninja (Konoha, Suna, etc.) con su país. |
+| `Paises` | Los países a los que pertenecen las aldeas. |
+| `Aldeas` | Las villas ninja, cada una pertenece a un país. |
 | `Rangos` | La jerarquía, de Estudiante hasta Kage, con un nivel de prioridad. |
 | `Dificultades` | La clasificación de las misiones por código (D, C, B, A, S). |
 | `Elementos` | Las naturalezas de chakra (Fuego, Agua, Rayo, etc.). |
@@ -133,8 +134,8 @@ La moraleja que nos llevamos: un diagrama mal dibujado no significa que la base 
 
 Necesitás SQL Server y un cliente como SSMS o Azure Data Studio. Los scripts están numerados y hay que correrlos **en orden**, porque cada uno depende de que el anterior ya haya creado o cargado lo suyo.
 
-1. **`01_Estructura`** — crea la base y las 12 tablas.
-2. **`02_CargaDeDatos`** — cargá los archivos del 01 al 11 en orden. El orden importa por las claves foráneas (primero los catálogos, después ninjas y jutsus, y al final las tablas que cruzan datos como equipos, habilidades y asignaciones).
+1. **`01_Estructura`** — crea la base y las 13 tablas.
+2. **`02_CargaDeDatos`** — cargá los archivos del 01 al 12 en orden. El orden importa por las claves foráneas (primero los catálogos, después ninjas y jutsus, y al final las tablas que cruzan datos como equipos, habilidades y asignaciones).
 3. **`03_Vistas`** — crea las 6 vistas.
 4. **`04_Procedimientos`** — crea `SP_CurarNinja` y `SP_AsignarMision`.
 5. **`05_Triggers`** — crea los 3 triggers.
